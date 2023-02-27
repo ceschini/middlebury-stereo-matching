@@ -10,20 +10,18 @@
 import numpy as np
 from PIL import Image
 import cv2
-import colorspacious
 
 def stereo_match(left_img, right_img, kernel, max_offset):
     # Load in both images, assumed to be RGBA 8bit per channel images
-    left_img = Image.open(left_img).convert('RGB')
-    left = np.asarray(left_img)
-    right_img = Image.open(right_img).convert('RGB')
-    right = np.asarray(right_img)
-    
+    left_img = cv2.imread(left_img)
+    right_img = cv2.imread(right_img)
+
     # convert images to CIELAB color space
-    left = colorspacious.cspace_convert(left, "sRGB1", "CAM02-UCS")
-    right = colorspacious.cspace_convert(right, "sRGB1", "CAM02-UCS")
+    left = cv2.cvtColor(left_img, cv2.COLOR_BGR2LAB)
+    right = cv2.cvtColor(right_img, cv2.COLOR_BGR2LAB)
     
-    w, h, _ = left.shape  # assume that both images are same size   
+    # opencv shape = (h,w,c)
+    h, w, _ = left.shape  # assume that both images are same size
     
     # Depth (or disparity) map
     depth = np.zeros((w, h), np.uint8)
@@ -72,4 +70,4 @@ def stereo_match(left_img, right_img, kernel, max_offset):
     Image.fromarray(depth).save('depth.png')
 
 if __name__ == '__main__':
-    stereo_match("im2.png", "im6.png", 6, 30)  # 6x6 local search kernel, 30 pixel search range
+    stereo_match("view0.png", "view1.png", 6, 30)  # 6x6 local search kernel, 30 pixel search range
