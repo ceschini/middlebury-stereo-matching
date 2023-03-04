@@ -76,9 +76,9 @@ def stereo_match(left_img, right_img, kernel, max_offset):
             depth[y, x] = best_offset * offset_adjust
 
     # Convert to PIL and save it
-    Image.fromarray(depth).save('depth.png')
+    Image.fromarray(depth).save('img/outputs/depth.png')
 
 
 if __name__ == '__main__':
     # 6x6 local search kernel, 30 pixel search range
-    stereo_match("view0.png", "view1.png", 6, 30)
+    stereo_match("img/inputs/view0.png", "img/inputs/view1.png", 6, 30)
