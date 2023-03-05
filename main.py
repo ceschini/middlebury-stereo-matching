@@ -10,7 +10,7 @@
 
 import argparse
 from src.utils import IO
-# from src.utils import metrics
+from src.utils import metrics
 from src.stereomatch import stereo_match
 from src.ssd import ssd
 import cv2
@@ -23,15 +23,17 @@ def main(left_image, right_image, gt, kernel, max_offset, cost='ssd'):
 
     left_img, shape = IO.import_image(left_image, 'lab')
     right_img, _ = IO.import_image(right_image, 'lab')
-    gt, _ = IO.import_image(gt)
+    gt, _ = IO.import_image(gt, 'gray')
 
     cv2.imshow('Left', left_img)
     cv2.imshow('Right', right_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    cost = ssd
-    sm = stereo_match(left_img, right_img, cost, max_offset, kernel, shape)
+    if cost == 'ssd':
+        cost_function = ssd
+    sm = stereo_match(left_img, right_img, cost_function,
+                      max_offset, kernel, shape)
 
     print('Processing...')
     depth = sm.compute()
@@ -45,8 +47,8 @@ def main(left_image, right_image, gt, kernel, max_offset, cost='ssd'):
                     f'{img_name}_{gt_name}_{kernel}x{kernel}')
 
     # process metrics and log it
-
-    # metrics.log_metrics(depth, gt, kernel, img_name, cost)
+    mse = metrics.mse(depth, gt)
+    metrics.log_metrics(mse, kernel, img_name, cost)
 
 
 if __name__ == '__main__':

@@ -22,5 +22,5 @@ class stereo_match:
 
     def compute(self):
         return self.cost.compute(self.left_img, self.right_img,
-                                 self.max_offset, self.kernel,
+                                 self.kernel, self.max_offset,
                                  self.shape)

@@ -47,11 +47,10 @@ class metrics:
         # lower the error, the more similar
         return err
 
-    def log_metrics(self, estimate, ground_truth, k, name, cost):
-        mserr = self.mse(estimate, ground_truth)
-        log = open("../log.txt", "a")
-        log.write(
-            f"MSE of {name} with kernel {k} and {cost}: {mserr} \n"
-        )
+    def log_metrics(mse, bad_pix, k, name, cost):
+        log = open("log.txt", "a")
+        log.write(f"Metrics of {name}, kernel {k} and {cost} function:\n")
+        log.write(f"MSE: {mse}\n")
+        log.write(f"Bad pixels: {bad_pix}%\n")
         log.close()
         return 1

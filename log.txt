@@ -1,1 +1,1 @@
-MSE of im2.png with kernel 6 and ssd cost function : 11169.87154962963 
+MSE of im2 with kernel 3 and ssd: 10144.19197037037 
