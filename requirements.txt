@@ -36,6 +36,7 @@ jupyter_server==2.3.0
 jupyter_server_terminals==0.4.4
 jupyterlab-pygments==0.2.2
 kiwisolver==1.4.4
+llvmlite==0.39.1
 MarkupSafe==2.1.2
 matplotlib==3.7.1
 matplotlib-inline==0.1.6
@@ -48,7 +49,8 @@ nbformat==5.7.3
 nest-asyncio==1.5.6
 notebook==6.5.2
 notebook_shim==0.2.2
-numpy==1.24.2
+numba==0.56.4
+numpy==1.23.5
 opencv-python==4.7.0.72
 packaging==23.0
 pandocfilters==1.5.0
