@@ -1,24 +1,24 @@
 import cv2
 import os
 import numpy as np
-from skimage import img_as_ubyte
-from skimage.io import imread, imsave
-from skimage.color import rgb2gray
+from PIL import Image
 
 
 class IO:
 
     @staticmethod
-    def import_image(file_name, color_space='rgb'):
-        img = imread(file_name)
+    def import_image(file_name, color_space='bgr'):
+        img = cv2.imread(file_name)
+        shape = img.shape
         if color_space == 'lab':
-            # img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-            # return img_lab
-            pass
+            img_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+            l, _, _ = cv2.split(img_lab)
+            return np.asarray(l), shape
+
         elif color_space == 'gray':
-            img_gray = rgb2gray(img)
-            return img_gray
-        return img
+            img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            return img_gray, shape
+        return img, shape
 
     @staticmethod
     def export_image(image, dir, name):
@@ -28,28 +28,16 @@ class IO:
             os.mkdir(dir)
 
         path = os.path.join(dir, name)
-        file_name = path + '.jpg'
+        file_name = path + '.png'
         print(f'saving image to {file_name}')
-        imsave(file_name, img_as_ubyte(image), quality=100)
+        Image.fromarray(image).save(file_name)
         return file_name
-
-    @staticmethod
-    def split_channels(image):
-        c1, c2, c3 = cv2.split(image)
-        return c1, c2, c3
-
-    @staticmethod
-    def normalize_image(img, gt_img):
-        norm_img = img
-        if (np.max(gt_img) <= 0):
-            pass
-        else:
-            norm_img = img/np.max(gt_img)
-
-        return norm_img/np.max(norm_img)
 
 
 class metrics:
+
+    def __init__(self):
+        self.mse = None
 
     def mse(imageA, imageB):
         # ! both imgs must have same dims

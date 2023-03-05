@@ -9,54 +9,44 @@
 # Licensed under the MIT License
 
 import argparse
-from src.utils import metrics, IO
+from src.utils import IO
+# from src.utils import metrics
 from src.stereomatch import stereo_match
-from src.matcher import matcher
 from src.ssd import ssd
-import matplotlib.pyplot as plt
+import cv2
 
 
-def main(left_img, right_img, gt, kernel, max_offset, cost='ssd'):
+def main(left_image, right_image, gt, kernel, max_offset, cost='ssd'):
     # Load in both images, assumed to be RGBA 8bit per channel images
     gt_name = gt.split('/')[-1].split('.')[0]
-    img_name = left_img.split('/')[-1].split('.')[0]
+    img_name = left_image.split('/')[-1].split('.')[0]
 
-    left_img = IO.import_image(left_img, 'gray')
-    # l, a, b = IO.split_channels(left_img)
-    left_l = left_img
-    right_img = IO.import_image(right_img, 'gray')
-    # l, a, b = IO.split_channels(right_img)
-    right_l = right_img
-    gt = IO.import_image(gt)
+    left_img, shape = IO.import_image(left_image, 'lab')
+    right_img, _ = IO.import_image(right_image, 'lab')
+    gt, _ = IO.import_image(gt)
 
-    plt.figure(figsize=(8, 4))
-    plt.subplot(1, 2, 1), plt.imshow(
-        left_img, cmap='gray'), plt.title('Left')
-    plt.subplot(1, 2, 2), plt.imshow(
-        right_img, cmap='gray'), plt.title('Right')
-    plt.tight_layout()
+    cv2.imshow('Left', left_img)
+    cv2.imshow('Right', right_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    matching_alg = matcher
-    if cost == 'ssd':
-        matching_cost = ssd
-
-    sm = stereo_match(left_l, right_l, matching_cost,
-                      matching_alg, max_offset, kernel)
+    cost = ssd
+    sm = stereo_match(left_img, right_img, cost, max_offset, kernel, shape)
 
     print('Processing...')
-    sm.compute()
+    depth = sm.compute()
     print('Completed')
-    depth = sm.result()
-    plt.figure()
-    plt.imshow(depth, cmap='gray')
-    plt.show()
+    cv2.imshow('depth', depth)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     # save it
-    IO.export_image(IO.normalize_image(depth, gt), 'img/outputs/',
+    IO.export_image(depth, 'img/outputs/',
                     f'{img_name}_{gt_name}_{kernel}x{kernel}')
 
     # process metrics and log it
-    metrics.log_metrics(depth, gt, kernel, img_name, cost)
+
+    # metrics.log_metrics(depth, gt, kernel, img_name, cost)
 
 
 if __name__ == '__main__':
@@ -69,8 +59,8 @@ if __name__ == '__main__':
     parser.add_argument('-gt', '--ground_truth', type=str,
                         help='Path to ground truth image')
     parser.add_argument('-k', '--kernel', type=int,
-                        help='kernel window size', default=3)
-    parser.add_argument('-o', '--offset', type=int, default=60,
+                        help='kernel window size', default=6)
+    parser.add_argument('-o', '--offset', type=int, default=30,
                         help='maximum offset for pixel search range')
     args = parser.parse_args()
     main(args.left, args.right, args.ground_truth,
