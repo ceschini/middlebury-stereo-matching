@@ -50,15 +50,15 @@ def main(left_image, right_image, gt, kernel, offset, cost, plot):
 
     # save it
     IO.export_image(depth, 'img/outputs/',
-                    f'{img_name}_{gt_name}_{kernel}x{kernel}_{cost}')
+                    f'{img_name}_{gt_name}_{kernel}x{kernel}_{offset}_{cost}')
 
     # process metrics and log it
-    mse = metrics.mse(depth, gt)
+    rmse = metrics.rmse(depth, gt)
     bad_pixels = metrics.bad_pixels(depth, gt)
-    print('mse', mse)
-    print('bad_pixels', bad_pixels)
-    print('saving metrics to log.txt')
-    metrics.log_metrics(mse, bad_pixels, kernel, offset, img_name, cost)
+    print('rmse:', rmse)
+    print('bad_pixels:', bad_pixels)
+    print('saving metrics to log.csv')
+    metrics.log_metrics(rmse, bad_pixels, kernel, offset, img_name, cost)
 
 
 if __name__ == '__main__':

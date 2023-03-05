@@ -36,10 +36,11 @@ class IO:
 
 class metrics:
 
-    def mse(estimate, gt):
+    def rmse(estimate, gt):
         # ! both imgs must have same dims
         err = np.sum((estimate.astype("float") - gt.astype("float")) ** 2)
         err /= float(estimate.shape[0] * estimate.shape[1])
+        err = np.sqrt(err)
 
         # lower the error, the more similar
         return err
@@ -51,11 +52,8 @@ class metrics:
         error_rate = bad_pixels / total_pixels
         return error_rate * 100
 
-    def log_metrics(mse, bad_pix, k, off, name, cost):
-        log = open("log.txt", "a")
-        log.write(f"{name}, kernel {k}, {off} offset and {cost} function:\n")
-        log.write(f"MSE: {mse}\n")
-        log.write("Bad pixels: {:2f}%\n".format(bad_pix))
-        log.write("\n")
+    def log_metrics(rmse, bad_pix, k, off, name, cost):
+        log = open("log.csv", "a")
+        log.write(f"{name},{k},{off},{cost},{rmse},{bad_pix}\n")
         log.close()
         return 1
