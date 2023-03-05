@@ -36,21 +36,26 @@ class IO:
 
 class metrics:
 
-    def __init__(self):
-        self.mse = None
-
-    def mse(imageA, imageB):
+    def mse(estimate, gt):
         # ! both imgs must have same dims
-        err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
-        err /= float(imageA.shape[0] * imageA.shape[1])
+        err = np.sum((estimate.astype("float") - gt.astype("float")) ** 2)
+        err /= float(estimate.shape[0] * estimate.shape[1])
 
         # lower the error, the more similar
         return err
 
-    def log_metrics(mse, bad_pix, k, name, cost):
+    def bad_pixels(estimate, gt):
+        gt = np.round(gt / 4).astype(np.uint8)
+        bad_pixels = np.sum(np.abs(gt - estimate) > 5)
+        total_pixels = gt.shape[0] * gt.shape[1]
+        error_rate = bad_pixels / total_pixels
+        return error_rate * 100
+
+    def log_metrics(mse, bad_pix, k, off, name, cost):
         log = open("log.txt", "a")
-        log.write(f"Metrics of {name}, kernel {k} and {cost} function:\n")
+        log.write(f"{name}, kernel {k}, {off} offset and {cost} function:\n")
         log.write(f"MSE: {mse}\n")
-        log.write(f"Bad pixels: {bad_pix}%\n")
+        log.write("Bad pixels: {:2f}%\n".format(bad_pix))
+        log.write("\n")
         log.close()
         return 1

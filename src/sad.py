@@ -2,7 +2,7 @@ from numba import jit
 import numpy as np
 
 
-class ssd:
+class sad:
     @staticmethod
     @jit(nopython=True, parallel=True, cache=True)
     def compute(left_img, right_img, kernel, max_offset, shape):
@@ -24,7 +24,6 @@ class ssd:
 
                 for offset in range(max_offset):
                     ssd = 0
-                    ssd_temp = 0
 
                     for v in range(-kernel_half, kernel_half):
                         for u in range(-kernel_half, kernel_half):
@@ -32,10 +31,9 @@ class ssd:
                             if y+v >= h or x+u >= w or (x+u) - offset < 0:
                                 continue
 
-                            diff = left_img[y+v, x+u] - \
-                                right_img[y+v, (x+u) - offset]
-                            ssd_temp = diff * diff
-                            ssd += ssd_temp
+                            diff = np.abs(left_img[y+v, x+u] -
+                                          right_img[y+v, (x+u) - offset])
+                            ssd += diff
 
                     if ssd < prev_ssd:
                         prev_ssd = ssd
